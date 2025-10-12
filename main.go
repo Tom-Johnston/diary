@@ -11,7 +11,7 @@ func main() {
 	targetStart := time.Date(2025, time.October, 1, 0, 0, 0, 0, time.UTC)
 	targetEnd := targetStart.AddDate(1, 0, 0)
 	outputFile := "diary.html"
-	numLines := 8
+	numLines := 6
 
 	f, err := os.Create(outputFile)
 	if err != nil {
@@ -73,12 +73,14 @@ func main() {
 
 		endCal := time.Date(calYear, calMonth, 1, 0, 0, 0, 0, time.UTC).AddDate(0, 1, 0)
 		for currCalDate.Before(endCal) {
+			linkTarget := currCalDate.Format("2006-01-02")
 			for i := 0; i < 7; i++ {
 				class := "cal-entry"
 				if currCalDate.Month() != calMonth {
 					class += " cal-other-month"
 				}
-				fmt.Fprintf(f, "<span class=\"%v\">%v</span>\n", class, currCalDate.Day())
+
+				fmt.Fprintf(f, "<a href=\"#%v\"><span class=\"%v\">%v</span></a>\n", linkTarget, class, currCalDate.Day())
 				currCalDate = currCalDate.AddDate(0, 0, 1)
 			}
 		}
@@ -90,7 +92,7 @@ func main() {
 	fmt.Fprintln(f, "</div>")
 
 	for currDate.Before(targetEnd) {
-		fmt.Fprintln(f, `<div class="page week">`)
+		fmt.Fprintf(f, `<div id="%v" class="page week">`, currDate.Format("2006-01-02"))
 
 		// Add the calendar
 		tmp := currDate
@@ -127,6 +129,7 @@ func main() {
 		}
 		endCal := time.Date(calYear, calMonth, 1, 0, 0, 0, 0, time.UTC).AddDate(0, 1, 0)
 		for currCalDate.Before(endCal) {
+			linkTarget := currCalDate.Format("2006-01-02")
 			currentWeek := false
 			if currCalDate == currDate {
 				currentWeek = true
@@ -139,7 +142,7 @@ func main() {
 				if currCalDate.Month() != calMonth {
 					class += " cal-other-month"
 				}
-				fmt.Fprintf(f, "<span class=\"%v\">%v</span>\n", class, currCalDate.Day())
+				fmt.Fprintf(f, "<a href=\"#%v\"><span class=\"%v\">%v</span></a>\n", linkTarget, class, currCalDate.Day())
 				currCalDate = currCalDate.AddDate(0, 0, 1)
 			}
 		}
@@ -157,40 +160,16 @@ func main() {
 				fmt.Fprintln(f, "<a href=\"#title\" class=\"home-anchor\"><img class=\"home\" src=\"calendar-tight.svg\" alt=\"View entire year\"/></a>")
 			}
 			for i := 0; i < numLines; i++ {
-				fmt.Fprintln(f, "<div class=\"dotted\"></div>")
+				fmt.Fprintln(f, "<div class=\"lines\"></div>")
 			}
 			if currDate.Weekday() != time.Saturday && currDate.Weekday() != time.Sunday {
 				for i := 0; i < numLines; i++ {
-					fmt.Fprintln(f, "<div class=\"dotted\"></div>")
+					fmt.Fprintln(f, "<div class=\"lines\"></div>")
 				}
 			}
 			fmt.Fprintln(f, "</div>")
 			currDate = currDate.AddDate(0, 0, 1)
 		}
-		// <div class="day mon">
-		//     <div class="day-title">
-		//         <h2 class="day-num">8</h2>
-		//         <span class="day-name">Monday</span>
-		//         <span class="day-month">October</span>
-		//     </div>
-		//     <img class="home" src="calendar-tight.svg" alt="View entire year"/>
-		//     <div class="dotted"></div>
-		//     <div class="dotted"></div>
-		//     <div class="dotted"></div>
-		//     <div class="dotted"></div>
-		//     <div class="dotted"></div>
-		//     <div class="dotted"></div>
-		//     <div class="dotted"></div>
-		//     <div class="dotted"></div>
-		//     <div class="dotted"></div>
-		//     <div class="dotted"></div>
-		//     <div class="dotted"></div>
-		//     <div class="dotted"></div>
-		//     <div class="dotted"></div>
-		//     <div class="dotted"></div>
-		//     <div class="dotted"></div>
-		//     <div class="dotted"></div>
-		// </div>
 
 		fmt.Fprintln(f, "</div>")
 

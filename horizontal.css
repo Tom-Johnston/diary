@@ -39,9 +39,7 @@ h6 { font-size: 16px; }
 p { margin: 10px 0 15px 0; overflow-wrap: break-word; word-wrap: break-word; }
 @media print { p { text-align: justify; } }
 
-a { text-decoration: none; color: #0d6cba; text-shadow: none; transition: color 0.5s ease; transition: text-shadow 0.5s ease; -webkit-transition: color 0.5s ease; -webkit-transition: text-shadow 0.5s ease; -moz-transition: color 0.5s ease; -moz-transition: text-shadow 0.5s ease; -o-transition: color 0.5s ease; -o-transition: text-shadow 0.5s ease; -ms-transition: color 0.5s ease; -ms-transition: text-shadow 0.5s ease; }
-@media print { a { color: inherit; text-decoration: underline; }
-  a:link:after, a:visited:after { content: " (" attr(href) ")"; } }
+a { text-decoration: none;}
 
 a:hover, a:focus { text-decoration: underline; }
 
@@ -126,6 +124,7 @@ Particular styles
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     padding: 0.5cm;
+    grid-template-rows: auto 1fr 1fr 1fr;
 }
 
 .week{
@@ -166,7 +165,7 @@ Particular styles
     display: block;
     grid-column: 1 / 4;
     text-align: center;
-    text-decoration: underline;
+    margin: 1cm 0;
 }
 
 .calendar{
@@ -233,6 +232,7 @@ Particular styles
     display: grid;
     background: white;
     padding-right: 0.5cm;
+    margin-top: 0.05cm;
     grid-template-columns: auto auto;
     grid-template-rows: auto auto;
     grid-template-areas: 
@@ -261,19 +261,11 @@ Particular styles
     line-height: 1em;
 }
 
-.dotted{
+.lines{
     display: block;
-    height: 0.5cm;
     flex-grow: 1;
-    /* background-image: radial-gradient(circle at 1pt 1pt, #abced4 1pt, transparent 0);
-    background-size: 3pt 0.5cm; */
     border: solid 0 #808080;
     border-width: 0 0 0.2mm 0;
-}
-
-.lined{
-    background-image: linear-gradient(90deg, transparent 79px, #abced4 79px, #abced4 81px, transparent 81px), linear-gradient(#eee .1em, transparent .1em);
-    background-size: 100% 1.2em;
 }
 
 .monday{
