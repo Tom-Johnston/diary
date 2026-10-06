@@ -2,8 +2,10 @@
 
 An A4 week-to-view diary PDF.
 
-<img src="preview/overview.svg" alt="Year overview page." width="49%">
-<img src="preview/week.svg" alt="Week-to-view page for 20 to 26 December, with Christmas Eve, Christmas Day and Boxing Day marked." width="49%">
+<p>
+  <img src="preview/overview.svg" alt="Year overview page." width="49%">
+  <img src="preview/week.svg" alt="Week-to-view page for 20 to 26 December, with Christmas Eve, Christmas Day and Boxing Day marked." width="49%">
+</p>
 
 ## Download
 
