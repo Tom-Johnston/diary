@@ -10,10 +10,10 @@ import (
 
 func main() {
 	title := "Diary 2027"
-	// Inclusive
-	targetStart := time.Date(2027, time.January, 1, 0, 0, 0, 0, time.UTC)
-	// This is not inclusive
-	targetEnd := targetStart.AddDate(1, 0, 0)
+	// Inclusive.
+	startDate := time.Date(2027, time.January, 1, 0, 0, 0, 0, time.UTC)
+	// Not inclusive.
+	endDate := startDate.AddDate(1, 0, 0)
 	outputFile := "diary.html"
 	numLines := 6
 
@@ -22,11 +22,11 @@ func main() {
 		panic(err)
 	}
 
-	currDate := targetStart
+	currDate := startDate
 	for currDate.Weekday() != time.Monday {
 		currDate = currDate.AddDate(0, 0, -1)
 	}
-	fmt.Printf("Target start: %v\n", targetStart)
+	fmt.Printf("Target start: %v\n", startDate)
 	fmt.Printf("Actual start: %v\n", currDate)
 
 	// Preamble
@@ -76,10 +76,10 @@ func main() {
 
 	fmt.Fprintln(f, `<div class="page all">`)
 
-	fmt.Fprintf(f, "<h1 id=\"title\" class=\"title\">%v %v &ndash; %v %v</h1>", targetStart.Month(), targetStart.Year(), targetEnd.AddDate(0, 0, -1).Month(), targetEnd.AddDate(0, 0, -1).Year())
+	fmt.Fprintf(f, "<h1 id=\"title\" class=\"title\">%v %v &ndash; %v %v</h1>", startDate.Month(), startDate.Year(), endDate.AddDate(0, 0, -1).Month(), endDate.AddDate(0, 0, -1).Year())
 
-	allCalDate := time.Date(targetStart.Year(), targetStart.Month(), 1, 0, 0, 0, 0, time.UTC)
-	for allCalDate.Before(targetEnd) {
+	allCalDate := time.Date(startDate.Year(), startDate.Month(), 1, 0, 0, 0, 0, time.UTC)
+	for allCalDate.Before(endDate) {
 
 		calYear := allCalDate.Year()
 		calMonth := allCalDate.Month()
@@ -127,7 +127,7 @@ func main() {
 		gridRowTemplate += "1fr "
 	}
 
-	for currDate.Before(targetEnd) {
+	for currDate.Before(endDate) {
 		fmt.Fprintf(f, `<div id="%v" class="page week">`, currDate.Format("2006-01-02"))
 
 		// Add the calendar
@@ -152,18 +152,18 @@ func main() {
 		// Force the selected month to be within the months on the first page.
 
 		// Cannot be too early.
-		if time.Date(calYear, calMonth, 1, 0, 0, 0, 0, time.UTC).Before(time.Date(targetStart.Year(), targetStart.Month(), 1, 0, 0, 0, 0, time.UTC)) {
+		if time.Date(calYear, calMonth, 1, 0, 0, 0, 0, time.UTC).Before(time.Date(startDate.Year(), startDate.Month(), 1, 0, 0, 0, 0, time.UTC)) {
 			nextMonth := time.Date(calYear, calMonth, 1, 0, 0, 0, 0, time.UTC).AddDate(0, 1, 0)
 			calMonth = nextMonth.Month()
 			calYear = nextMonth.Year()
 		}
 
 		// Cannot be too late.
-		lastDay := targetEnd.AddDate(0, 0, -1)
+		lastDay := endDate.AddDate(0, 0, -1)
 		if time.Date(calYear, calMonth, 1, 0, 0, 0, 0, time.UTC).After(time.Date(lastDay.Year(), lastDay.Month(), 1, 0, 0, 0, 0, time.UTC)) {
-			prev := time.Date(calYear, calMonth, 1, 0, 0, 0, 0, time.UTC).AddDate(0, -1, 0)
-			calMonth = prev.Month()
-			calYear = prev.Year()
+			prevMonth := time.Date(calYear, calMonth, 1, 0, 0, 0, 0, time.UTC).AddDate(0, -1, 0)
+			calMonth = prevMonth.Month()
+			calYear = prevMonth.Year()
 		}
 
 		fmt.Fprintln(f, `<div class="calendar">`)
@@ -218,7 +218,7 @@ func main() {
 				for ; j < len(occasions); j++ {
 					fmt.Fprintln(f, "<div class=\"lines\">")
 					if occasions[j].fontSize != "" {
-						fmt.Fprintf(f, "<span class=\"occasion\" style=\"font-size: %vrem\">%v</span>\n", occasions[j].fontSize, occasions[j].name)
+						fmt.Fprintf(f, "<span class=\"occasion\" style=\"font-size: %v\">%v</span>\n", occasions[j].fontSize, occasions[j].name)
 					} else {
 						fmt.Fprintf(f, "<span class=\"occasion\">%v</span>\n", occasions[j].name)
 					}
