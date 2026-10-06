@@ -117,14 +117,15 @@ Particular styles
     background: white;
     overflow: hidden;
     width: 21cm;
-    height: 29.6cm;
+    height: 29.7cm;
 }
 
 .all{
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     padding: 0.5cm;
-    grid-template-rows: auto 1fr 1fr 1fr;
+    grid-template-rows: auto 1fr 1fr 1fr 1fr;
+    grid-column-gap: 0.5cm;
 }
 
 .week{
@@ -141,6 +142,7 @@ Particular styles
     padding-left: 0.5cm;
     padding-top: 0.5cm;
     padding-bottom: 0.5cm;
+    padding-right: 0.5cm;
 }
 
 .side-bar{
@@ -173,7 +175,6 @@ Particular styles
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     text-align: center;
-    margin-right: 0.5cm;
 }
 
 .cal-month{
@@ -183,6 +184,7 @@ Particular styles
     font-weight: 500;
     border: solid #373737 0;
     border-bottom-width: 0.5mm;
+    print-color-adjust: exact;
 }
 
 .all .cal-month{
@@ -205,8 +207,6 @@ Particular styles
     position: relative;
     display: grid;
     column-gap: 0.5cm;
-    margin-left: 0.5cm;
-    margin-right: 0.5cm;
     padding-bottom: 0.5cm;
     grid-template-columns: 1fr 1fr;
     border: #373737 solid 0px;
@@ -241,6 +241,10 @@ Particular styles
     ;
 }
 
+.sunday .day-title{
+    padding-left: 0.5cm;
+}
+
 .day-num{
     grid-area: num;
     margin: 0;
@@ -262,10 +266,16 @@ Particular styles
 }
 
 .lines{
-    display: block;
-    flex-grow: 1;
+    display: flex;
     border: solid 0 #808080;
     border-width: 0 0 0.2mm 0;
+    justify-content: end;
+    align-items: end;
+}
+
+.occasion{
+    font-weight: 300;
+    font-size: 0.75rem;
 }
 
 .monday{
@@ -303,8 +313,6 @@ Particular styles
 
 .sunday{
     grid-area: sun;
-    display: flex;
-    flex-direction: column;
     border-width: 0 var(--div-width) 0 var(--div-width);
     grid-template-columns: 1fr;
     margin: 0;
@@ -327,4 +335,9 @@ Particular styles
 		/* Force page breaks after each .page element of the document */
 		page-break-after: always;
 	}
+}
+
+@page {
+    size: A4;
+    margin: 0;
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
 	"os"
 	"strings"
@@ -8,7 +9,8 @@ import (
 )
 
 func main() {
-	targetStart := time.Date(2025, time.October, 1, 0, 0, 0, 0, time.UTC)
+	title := "Academic Diary 2026&ndash;2027"
+	targetStart := time.Date(2026, time.October, 1, 0, 0, 0, 0, time.UTC)
 	targetEnd := targetStart.AddDate(1, 0, 0)
 	outputFile := "diary.html"
 	numLines := 6
@@ -26,20 +28,46 @@ func main() {
 	fmt.Printf("Actual start: %v\n", currDate)
 
 	// Preamble
-	preamble := `
-<!DOCTYPE html>
-<html lang="en">
+	fmt.Fprintln(f, `<!DOCTYPE html>`)
+	fmt.Fprintln(f, `<html lang="en">`)
+	fmt.Fprintln(f, `<head>`)
+	fmt.Fprintln(f, `  <meta charset="UTF-8">`)
+	fmt.Fprintf(f, "  <title>%v</title>\n", title)
+	fmt.Fprintf(f, "  <meta name=\"Description\" content=\"%v\">\n", title)
+	fmt.Fprintln(f, `  <link rel="stylesheet" type="text/css" href="horizontal.css">`)
+	fmt.Fprintln(f, `</head>`)
+	fmt.Fprintln(f, `<body>`)
 
-<head>
-  <meta charset="UTF-8">
-  <title>2025 Academic Diary</title>
-  <meta name="Description" content="2025 Academic Diary">
-  <link rel="stylesheet" type="text/css" href="horizontal.css">
-</head>
+	// Load the important dates.
+	type occasion struct {
+		name     string
+		fontSize string
+	}
+	importantDates := map[time.Time][]occasion{}
 
-<body>`
+	csvFile, err := os.Open("important-dates.csv")
+	if err != nil {
+		panic(err)
+	}
 
-	fmt.Fprintln(f, preamble)
+	records, err := csv.NewReader(csvFile).ReadAll()
+	if err != nil {
+		panic(err)
+	}
+
+	err = csvFile.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	for _, record := range records[1:] {
+		date, err := time.Parse("02/01/2006", record[0])
+		if err != nil {
+			panic(err)
+		}
+		importantDates[date] = append(importantDates[date], occasion{name: record[1], fontSize: strings.TrimSpace(record[2])})
+	}
+	fmt.Printf("Loaded %d important dates.\n", len(importantDates))
 
 	// Add the initial page
 	// We will start with the month of the targetStart even if we could fit it into the start of the next month.
@@ -91,6 +119,12 @@ func main() {
 
 	fmt.Fprintln(f, "</div>")
 
+	// Generate the gridTemplateRows
+	gridRowTemplate := ""
+	for _ = range numLines {
+		gridRowTemplate += "1fr "
+	}
+
 	for currDate.Before(targetEnd) {
 		fmt.Fprintf(f, `<div id="%v" class="page week">`, currDate.Format("2006-01-02"))
 
@@ -108,8 +142,9 @@ func main() {
 		calYear := currDate.Year()
 
 		if inCurrMonth <= 3 {
-			calMonth = currDate.AddDate(0, 1, 0).Month()
-			calYear = currDate.AddDate(0, 1, 0).Year()
+			nextMonth := time.Date(calYear, calMonth, 1, 0, 0, 0, 0, time.UTC).AddDate(0, 1, 0)
+			calMonth = nextMonth.Month()
+			calYear = nextMonth.Year()
 		}
 
 		fmt.Fprintln(f, `<div class="calendar">`)
@@ -150,7 +185,7 @@ func main() {
 
 		// Now add each of the boxes
 		for i := 0; i < 7; i++ {
-			fmt.Fprintf(f, "<div class=\"day %v\">\n", strings.ToLower(currDate.Weekday().String()))
+			fmt.Fprintf(f, "<div class=\"day %v\" style=\"grid-template-rows:%v\">\n", strings.ToLower(currDate.Weekday().String()), gridRowTemplate)
 			fmt.Fprintln(f, "<div class=\"day-title\">")
 			fmt.Fprintf(f, "<h2 class=\"day-num\">%v</h2>\n", currDate.Day())
 			fmt.Fprintf(f, "<span class=\"day-name\">%v</span>\n", currDate.Weekday().String())
@@ -159,7 +194,21 @@ func main() {
 			if currDate.Weekday() == time.Monday {
 				fmt.Fprintln(f, "<a href=\"#title\" class=\"home-anchor\"><img class=\"home\" src=\"calendar-tight.svg\" alt=\"View entire year\"/></a>")
 			}
-			for i := 0; i < numLines; i++ {
+			j := 0
+			if occasions, ok := importantDates[currDate]; ok {
+				for ; j < len(occasions); j++ {
+					fmt.Fprintln(f, "<div class=\"lines\">")
+					if occasions[j].fontSize != "" {
+						fmt.Fprintf(f, "<span class=\"occasion\" style=\"font-size: %vrem\">%v</span>\n", occasions[j].fontSize, occasions[j].name)
+					} else {
+						fmt.Fprintf(f, "<span class=\"occasion\">%v</span>\n", occasions[j].name)
+					}
+					fmt.Fprintln(f, "</div>")
+				}
+
+			}
+
+			for ; j < numLines; j++ {
 				fmt.Fprintln(f, "<div class=\"lines\"></div>")
 			}
 			if currDate.Weekday() != time.Saturday && currDate.Weekday() != time.Sunday {
