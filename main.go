@@ -9,8 +9,10 @@ import (
 )
 
 func main() {
-	title := "Academic Diary 2026&ndash;2027"
-	targetStart := time.Date(2026, time.October, 1, 0, 0, 0, 0, time.UTC)
+	title := "Diary 2027"
+	// Inclusive
+	targetStart := time.Date(2027, time.January, 1, 0, 0, 0, 0, time.UTC)
+	// This is not inclusive
 	targetEnd := targetStart.AddDate(1, 0, 0)
 	outputFile := "diary.html"
 	numLines := 6
@@ -145,6 +147,23 @@ func main() {
 			nextMonth := time.Date(calYear, calMonth, 1, 0, 0, 0, 0, time.UTC).AddDate(0, 1, 0)
 			calMonth = nextMonth.Month()
 			calYear = nextMonth.Year()
+		}
+
+		// Force the selected month to be within the months on the first page.
+
+		// Cannot be too early.
+		if time.Date(calYear, calMonth, 1, 0, 0, 0, 0, time.UTC).Before(time.Date(targetStart.Year(), targetStart.Month(), 1, 0, 0, 0, 0, time.UTC)) {
+			nextMonth := time.Date(calYear, calMonth, 1, 0, 0, 0, 0, time.UTC).AddDate(0, 1, 0)
+			calMonth = nextMonth.Month()
+			calYear = nextMonth.Year()
+		}
+
+		// Cannot be too late.
+		lastDay := targetEnd.AddDate(0, 0, -1)
+		if time.Date(calYear, calMonth, 1, 0, 0, 0, 0, time.UTC).After(time.Date(lastDay.Year(), lastDay.Month(), 1, 0, 0, 0, 0, time.UTC)) {
+			prev := time.Date(calYear, calMonth, 1, 0, 0, 0, 0, time.UTC).AddDate(0, -1, 0)
+			calMonth = prev.Month()
+			calYear = prev.Year()
 		}
 
 		fmt.Fprintln(f, `<div class="calendar">`)
